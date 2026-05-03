@@ -1,0 +1,114 @@
+---
+title: 'Output settings: format, codec, and file naming'
+description: 'Control where QualityScaler saves upscaled files, choose image and video output formats, select a video codec, and understand output filename patterns.'
+keywords: ['QualityScaler', 'output settings', 'output path', 'image format', 'video codec', 'keep frames', 'output filename', 'file naming']
+---
+
+QualityScaler gives you full control over where upscaled files are saved, which format they use, and how video encoding is performed. These settings are independent of the AI model — you can change them without affecting upscaling quality.
+
+## Output path
+
+By default, QualityScaler saves all output files to the **same folder as the input file**. You can change this to a custom folder:
+
+1. In the output settings panel, locate the **Output path** control.
+2. Click to switch from the default to a custom path.
+3. Choose the folder where you want output files saved.
+
+All output files from that session will be written to the selected folder.
+
+## Image output extension
+
+When upscaling images, you can choose the file format for the output:
+
+| Extension | Format | Notes |
+|-----------|--------|-------|
+| `.png` | PNG | Lossless; larger file sizes |
+| `.jpg` | JPEG | Lossy; smaller file sizes |
+| `.bmp` | Bitmap | Uncompressed; very large file sizes |
+| `.tiff` | TIFF | Lossless; widely compatible |
+
+<Tip>
+  Use `.png` when you need lossless output for further editing. Use `.jpg` to minimize file size when the upscaled image is the final deliverable.
+</Tip>
+
+## Video output extension
+
+When upscaling videos, choose the container format for the output:
+
+| Extension | Format |
+|-----------|--------|
+| `.mp4` | MPEG-4 |
+| `.mkv` | Matroska |
+| `.avi` | AVI |
+| `.mov` | QuickTime |
+
+## Video codec
+
+The **Video codec** setting controls which encoder ffmpeg uses to compress the output video. QualityScaler supports both software and hardware-accelerated codecs:
+
+<Tabs>
+  <Tab title="Software">
+    | Codec | Description |
+    |-------|-------------|
+    | `x264` | H.264 software encoding. Widely compatible, moderate speed. |
+    | `x265` | H.265 / HEVC software encoding. Better compression than x264 but slower. |
+  </Tab>
+  <Tab title="NVIDIA">
+    | Codec | Description |
+    |-------|-------------|
+    | `h264_nvenc` | H.264 hardware encoding via NVIDIA NVENC. Fast, requires NVIDIA GPU. |
+    | `hevc_nvenc` | H.265 hardware encoding via NVIDIA NVENC. Better compression, requires NVIDIA GPU. |
+  </Tab>
+  <Tab title="AMD">
+    | Codec | Description |
+    |-------|-------------|
+    | `h264_amf` | H.264 hardware encoding via AMD AMF. Requires AMD GPU. |
+    | `hevc_amf` | H.265 hardware encoding via AMD AMF. Requires AMD GPU. |
+  </Tab>
+  <Tab title="Intel">
+    | Codec | Description |
+    |-------|-------------|
+    | `h264_qsv` | H.264 hardware encoding via Intel Quick Sync. Requires Intel GPU or CPU with integrated graphics. |
+    | `hevc_qsv` | H.265 hardware encoding via Intel Quick Sync. Requires Intel GPU. |
+  </Tab>
+</Tabs>
+
+<Warning>
+  Hardware-accelerated codecs (NVENC, AMF, QSV) require the matching GPU to be present and accessible. Selecting a codec for hardware you do not have will cause encoding to fail.
+</Warning>
+
+## Keep frames
+
+During video upscaling, QualityScaler extracts every video frame to disk before processing them. The **Keep frames** setting controls what happens to these extracted frames after encoding is complete:
+
+| Setting | Behavior |
+|---------|----------|
+| **OFF** (default) | Extracted frames are deleted after the output video is encoded. |
+| **ON** | Extracted frames are kept on disk in a folder next to the input file. |
+
+Enable **Keep frames** if you want access to the individual upscaled frames for compositing, further editing, or manual inspection.
+
+<Note>
+  Extracted frames can use significant disk space — a one-minute 1080p video at 24 fps produces roughly 1,440 PNG frames. Make sure you have enough free space before enabling this option.
+</Note>
+
+## Output filename format
+
+QualityScaler automatically names output files to reflect the settings used to produce them. The naming pattern is:
+
+```text
+<original_name>_<AI_model>_InputR-<input%>_OutputR-<output%>[_Blending-Low/Medium/High].<ext>
+```
+
+The `_Blending-` segment is only included when **AI Blending** is set to **Low**, **Medium**, or **High**. It is omitted when blending is **OFF**.
+
+**Examples:**
+
+```text
+photo_BSRGANx4_InputR-100_OutputR-100.png
+photo_BSRGANx4_InputR-75_OutputR-100_Blending-Low.jpg
+clip_LVAx2_InputR-100_OutputR-100.mp4
+clip_RealESR_Gx4_InputR-50_OutputR-100_Blending-Medium.mkv
+```
+
+This naming convention makes it easy to compare outputs from different settings without manually renaming files.

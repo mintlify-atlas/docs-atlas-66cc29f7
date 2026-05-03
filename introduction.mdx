@@ -1,0 +1,55 @@
+---
+title: 'QualityScaler: AI upscaler for images and videos'
+description: 'QualityScaler is a free Windows desktop app that upscales and de-noises photos and videos using local AI models — no internet connection required.'
+keywords: ['QualityScaler', 'AI upscaler', 'image upscaling', 'video upscaling', 'Windows', 'ONNX', 'DirectML', 'offline']
+---
+
+QualityScaler is a Windows desktop application that uses AI-powered deep learning models to upscale, enhance, and de-noise photographs and videos. It runs entirely on your PC — no cloud account, no subscription, and no internet connection required at any point.
+
+## Key features
+
+<CardGroup cols={2}>
+  <Card title="Image and video upscaling" icon="image" href="/guides/upscaling-images">
+    Upscale images (JPG, PNG, WEBP, HEIC, BMP, TIFF) and videos (MP4, MKV, AVI, MOV, and more) up to 4x their original resolution.
+  </Card>
+  <Card title="Multiple AI models" icon="brain" href="/guides/ai-models">
+    Choose from nine AI models tuned for different content types: photos, animation, live-action video, sharpening, and noise reduction.
+  </Card>
+  <Card title="GPU acceleration" icon="microchip" href="/advanced/gpu-configuration">
+    Powered by DirectX 12 on any compatible GPU — AMD, Intel, or NVIDIA. Supports multiple GPUs and automatic tiling to work within your VRAM budget.
+  </Card>
+  <Card title="Flexible output control" icon="sliders" href="/guides/output-settings">
+    Control input/output resolution scaling, AI blending, output file format, and hardware-accelerated video encoding (NVENC, AMF, QSV).
+  </Card>
+  <Card title="Video stop and resume" icon="circle-pause" href="/advanced/stop-resume">
+    Pause a long video upscaling job and pick it back up later without losing progress.
+  </Card>
+  <Card title="Fully offline" icon="lock" href="/reference/system-requirements">
+    All processing happens locally on your PC. QualityScaler never sends data to any server.
+  </Card>
+</CardGroup>
+
+## Where to get it
+
+QualityScaler is available on two storefronts:
+
+- **itch.io** — [jangystudio.itch.io/qualityscaler](https://jangystudio.itch.io/qualityscaler)
+- **Steam** — [store.steampowered.com/app/2463110/QualityScaler](https://store.steampowered.com/app/2463110/QualityScaler/)
+
+Both provide the same pre-built Windows application. Developers who want to run from source can follow the [installation guide](/installation).
+
+## How it is built
+
+QualityScaler is written entirely in Python. The key libraries are:
+
+- **onnxruntime-directml** — runs ONNX AI models with DirectX 12 GPU acceleration
+- **customtkinter** — provides the Windows 11-style GUI
+- **OpenCV** (`opencv-python-headless`) — handles image and video frame processing
+- **Pillow** — image loading and format conversion
+- **ffmpeg** — video frame extraction and hardware-accelerated encoding
+
+The AI models are distributed as `.onnx` files and loaded at runtime. They are downloaded separately and placed in the `/AI-onnx` folder alongside the application.
+
+## Privacy
+
+QualityScaler is fully offline. It does not make any network requests during installation or normal use. All AI inference runs locally on your GPU using DirectML. No usage data, telemetry, or image content is ever transmitted.

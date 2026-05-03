@@ -1,0 +1,103 @@
+---
+title: 'Automatic image tiling and VRAM management'
+description: 'How QualityScaler splits large images into tiles when they exceed the GPU VRAM limit, with tile size calculations and per-model VRAM multipliers.'
+keywords: ['QualityScaler', 'tiling', 'VRAM', 'tile size', 'out of memory', 'large images', 'BSRGANx4', 'AI upscaling', 'GPU memory']
+---
+
+When an image or video frame is too large to fit in GPU memory in a single pass, QualityScaler automatically splits it into smaller tiles, upscales each tile independently, and then reassembles the result. This process is invisible during normal use — you always receive a single seamless output image regardless of whether tiling was used.
+
+## How tiling works
+
+QualityScaler always processes images in tiles. The **GPU VRAM** value you enter and the selected AI model together determine the tile size. The tile size — `tiles_resolution` — is a dimension in pixels (width and height of each tile):
+
+```python
+# From user_input_checks() in QualityScaler.py
+vram_multiplier  = VRAM_model_usage[selected_AI_model]
+selected_vram    = vram_multiplier * vram_gb
+tiles_resolution = int(selected_vram * 100)
+```
+
+Each tile is a square of `tiles_resolution × tiles_resolution` pixels. Images are split into as many tiles as needed to cover the full image, upscaled tile by tile, and seamlessly reassembled.
+
+## Tile size calculation
+
+For example, with 4 GB of VRAM and the `BSRGANx4` model (multiplier 0.75):
+
+```text
+selected_vram    = 0.75 × 4    = 3.0
+tiles_resolution = int(3.0 × 100) = 300
+```
+
+Every image is split into 300×300 pixel tiles. A 1200×800 image would produce a 4×3 grid of tiles (12 tiles total). With a model that has a higher multiplier — `IRCNN_Mx1` at 4.0 and 4 GB VRAM:
+
+```text
+selected_vram    = 4.0 × 4    = 16.0
+tiles_resolution = int(16.0 × 100) = 1600
+```
+
+Each tile is 1600×1600 pixels. A 1200×800 image fits in a single tile (1 tile), so IRCNN processes small-to-medium images in one pass.
+
+<Note>
+  Tiling is always active — it is the normal processing path, not a fallback for large images. The tile size is what changes based on your VRAM and model selection. A larger tile size means fewer tiles and faster processing.
+</Note>
+
+## Per-model VRAM multipliers
+
+Each model has a different memory footprint, reflected in its VRAM multiplier:
+
+| Model | VRAM multiplier | Relative memory cost |
+|-------|----------------|----------------------|
+| `LVAx2` | 2.0 | Medium |
+| `RealESR_Gx4` | 2.5 | Medium–high |
+| `RealESR_Ax4` | 2.5 | Medium–high |
+| `BSRGANx2` | 0.8 | Low |
+| `BSRGANx4` | 0.75 | Low |
+| `RealESRGANx4` | 0.75 | Low |
+| `MSharpx4` | 1.5 | Medium |
+| `IRCNN_Mx1` | 4.0 | High per-pixel efficiency |
+| `IRCNN_Lx1` | 4.0 | High per-pixel efficiency |
+
+A lower multiplier means the model requires less memory per pixel, so larger images can be processed without tiling. A higher multiplier means the model needs more memory per pixel, which lowers the `tiles_resolution` threshold and makes tiling more likely on limited VRAM.
+
+<Note>
+  `IRCNN_Mx1` and `IRCNN_Lx1` have a multiplier of 4.0, which means they calculate a very large `tiles_resolution`. This reflects the fact that these 1x models (no upscaling, just de-noising) are efficient enough to process extremely large images without splitting.
+</Note>
+
+## How tiles are split and reassembled
+
+QualityScaler determines the number of tiles needed to cover the image along each axis:
+
+```python
+tiles_x = (width  + tiles_resolution - 1) // tiles_resolution
+tiles_y = (height + tiles_resolution - 1) // tiles_resolution
+```
+
+Each tile is cropped from the source image, upscaled independently, and written into the correct position in the output image. The output is a single image at the full upscaled resolution — there is no manual stitching step.
+
+## Tips for managing tiling
+
+<AccordionGroup>
+  <Accordion title="I see faint seam lines at tile boundaries">
+    Enable **AI Blending** and set it to **Low** or **Medium**. Blending mixes a portion of the original (or bilinear-upscaled) image with the AI output, which softens boundary discontinuities between tiles.
+
+    If seams are severe, try lowering **Input Resolution %** — a smaller input image produces fewer and larger tiles, reducing the number of boundaries.
+  </Accordion>
+
+  <Accordion title="I want to avoid tiling entirely">
+    Lower **Input Resolution %** before upscaling. For example, setting **Input Resolution %** to `50` halves both the width and height, reducing total pixel count to 25% of the original. This is often enough to bring a large image below the tiling threshold.
+
+    Alternatively, use a model with a lower VRAM multiplier such as `BSRGANx4` (0.75) or `RealESRGANx4` (0.75), which require less memory per pixel.
+  </Accordion>
+
+  <Accordion title="Out-of-memory errors despite tiling being active">
+    The **GPU VRAM** value may be set higher than your actual VRAM. Open Windows Task Manager, go to **Performance → GPU**, and read the **Dedicated GPU memory** value. Enter that exact number in the **GPU VRAM** field.
+
+    Also confirm that other applications are not consuming GPU memory. Close GPU-intensive apps (games, 3D software, browser hardware acceleration) before running QualityScaler.
+  </Accordion>
+
+  <Accordion title="How does multithreading interact with tiling?">
+    Tiling and multithreading operate at different levels. Tiling splits a single large frame into pieces for sequential processing. Multithreading processes multiple frames simultaneously. If a frame needs tiling, each of its tiles is processed one at a time within its thread — the thread count itself does not change how tiles are handled.
+
+    If you are processing large frames with tiling active, reducing the thread count lowers peak VRAM usage, since fewer full tile loads are in flight at once.
+  </Accordion>
+</AccordionGroup>

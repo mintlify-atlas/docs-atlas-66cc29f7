@@ -1,0 +1,86 @@
+---
+title: "Frequently asked questions — QualityScaler"
+description: "Answers to common questions about QualityScaler: GPU support, performance, stop and resume, output files, AI models, and platform compatibility."
+---
+
+Common questions about QualityScaler, its features, and how to get the best results.
+
+<AccordionGroup>
+  <Accordion title="What GPU brands does QualityScaler support?">
+    QualityScaler supports any GPU with DirectX 12 compatibility, including NVIDIA (GTX 10-series and newer), AMD (RX 5000-series and newer), Intel Arc discrete GPUs, and Intel UHD integrated graphics. It uses Microsoft's DirectML backend via `onnxruntime-directml` to run AI inference on all these platforms.
+  </Accordion>
+
+  <Accordion title="Does QualityScaler require an internet connection?">
+    No. QualityScaler is fully offline. All AI processing happens locally on your GPU. No data is sent to any server at any point.
+  </Accordion>
+
+  <Accordion title="Why do I get an 'Error while upscaling' message?">
+    Common causes:
+    - **Missing AI model file**: The `.onnx` file for the selected model is not in the `AI-onnx` folder. Download the models and place them there.
+    - **Insufficient VRAM**: The GPU VRAM value is set higher than your actual VRAM. Lower it to match your GPU's available memory.
+    - **Wrong GPU selected**: If you have multiple GPUs, try switching to **Auto** or a different GPU slot.
+    - **Unsupported file**: The input file may be corrupted or in an unexpected encoding.
+
+    You can report errors on [GitHub](https://github.com/Djdefrag/QualityScaler/releases).
+  </Accordion>
+
+  <Accordion title="Why is video upscaling slow?">
+    Video upscaling speed depends on several factors:
+    - **Resolution**: Higher input resolution means more pixels per frame to process.
+    - **AI model**: BSRGAN and IRCNN are slower than LVA and RealESR for video.
+    - **Thread count**: Increase AI Multithreading (2, 4, 6, or 8 threads) to process multiple frames in parallel.
+    - **GPU speed**: A faster dedicated GPU processes frames more quickly.
+    - **Input Resolution %**: Lowering this (e.g. to 75% or 50%) reduces the pixels fed into the AI and speeds up processing significantly.
+  </Accordion>
+
+  <Accordion title="Can I upscale multiple files at once?">
+    Yes. Click **SELECT FILES** to load multiple images and/or videos in a single session. QualityScaler processes them sequentially and applies the same settings to all files.
+  </Accordion>
+
+  <Accordion title="What does Input Resolution % do?">
+    Input Resolution % resizes your file before sending it to the AI model. Setting it to 75% means the image is scaled to 75% of its original size before upscaling. This is useful when:
+    - Your image is too large for your GPU VRAM and you want to avoid tiling.
+    - You want faster processing and are willing to accept slightly lower quality.
+    - Your source material has a lot of noise — downscaling before upscaling can smooth it out.
+
+    Output Resolution % then resizes the final upscaled result. The two controls work together: Input 100% + Output 100% = full pipeline at native resolution.
+  </Accordion>
+
+  <Accordion title="What does AI Blending do?">
+    AI Blending mixes the upscaled image with the original image using weighted averaging:
+    - **Low**: 30% original + 70% upscaled
+    - **Medium**: 50% original + 50% upscaled
+    - **High**: 70% original + 30% upscaled
+
+    This is useful when processing with tiling (to smooth tile boundaries) or when upscaling from a very low Input Resolution %. For most full-resolution upscaling, leave it set to **OFF**.
+  </Accordion>
+
+  <Accordion title="Can I stop video upscaling and resume it later?">
+    Yes. Click **STOP** at any point during video upscaling. Already-upscaled frames are saved to disk. To resume, simply click **UPSCALE** again on the same video with the same settings. QualityScaler detects the existing frames and skips them, continuing from where it left off.
+
+    Resume only works with identical settings (same AI model, input/output resize percentages, and blending level). Changing any of these will start fresh.
+  </Accordion>
+
+  <Accordion title="Where are my upscaled files saved?">
+    By default, upscaled files are saved in the same folder as the input file. The output filename includes the AI model and settings used:
+
+    ```text
+    photo_BSRGANx4_InputR-100_OutputR-100.png
+    video_LVAx2_InputR-100_OutputR-100.mp4
+    ```
+
+    You can choose a custom output folder using the output path selector in the app.
+  </Accordion>
+
+  <Accordion title="Why isn't IRCNN upscaling my image?">
+    IRCNN_Mx1 and IRCNN_Lx1 are **denoising** models, not upscaling models. They output the same resolution as the input (1x scale). Their purpose is to remove noise, compression artifacts, and grain from images and video frames. If you need to both denoise and upscale, run IRCNN first and then apply a BSRGAN or RealESRGAN model to the output.
+  </Accordion>
+
+  <Accordion title="What are the .onnx files in the AI-onnx folder?">
+    The `.onnx` files are the AI model weights in ONNX (Open Neural Network Exchange) format, stored at FP16 precision for efficiency. Each file corresponds to one model (e.g. `BSRGANx4_fp16.onnx`). If you are running QualityScaler from source, you must download these files and place them in the `AI-onnx/` folder. The pre-built app download includes them.
+  </Accordion>
+
+  <Accordion title="Can QualityScaler run on macOS or Linux?">
+    No. QualityScaler is Windows-only. It relies on DirectX 12 and the DirectML execution provider in onnxruntime, which are Windows-specific technologies. There is no macOS or Linux version.
+  </Accordion>
+</AccordionGroup>

@@ -1,0 +1,71 @@
+---
+title: 'Loading files into QualityScaler'
+description: 'Learn how to load images and videos into QualityScaler, what file formats are supported, and how to read the file information panel.'
+keywords: ['QualityScaler', 'load files', 'supported formats', 'file widget', 'SELECT FILES', 'image formats', 'video formats']
+---
+
+Before you can upscale anything, you need to load your source files. QualityScaler accepts a wide range of image and video formats and shows you resolution and processing information for each loaded file.
+
+## Loading files
+
+Click the **SELECT FILES** button in the left panel to open a file picker. You can select one or more files at once. After you choose your files, each one appears as a card in the file list.
+
+<Note>
+  You can load multiple files in a single session. All loaded files will be processed when you click **UPSCALE**.
+</Note>
+
+## Supported formats
+
+<Tabs>
+  <Tab title="Images">
+    QualityScaler supports the following image file types:
+
+    | Extension | Format |
+    |-----------|--------|
+    | `.jpg`, `.jpeg`, `.JPG`, `.JPEG` | JPEG |
+    | `.png`, `.PNG` | PNG |
+    | `.webp`, `.WEBP` | WebP |
+    | `.bmp`, `.BMP` | Bitmap |
+    | `.tif`, `.tiff`, `.TIF`, `.TIFF` | TIFF |
+    | `.heic` | High Efficiency Image (HEIC) |
+  </Tab>
+  <Tab title="Videos">
+    QualityScaler supports the following video file types:
+
+    | Extension | Format |
+    |-----------|--------|
+    | `.mp4`, `.MP4` | MPEG-4 |
+    | `.mkv`, `.MKV` | Matroska |
+    | `.avi`, `.AVI` | AVI |
+    | `.mov`, `.MOV` | QuickTime |
+    | `.webm`, `.WEBM` | WebM |
+    | `.flv`, `.FLV` | Flash Video |
+    | `.gif`, `.GIF` | GIF |
+    | `.m4v` | iTunes Video |
+    | `.qt` | QuickTime |
+    | `.3gp` | 3GPP |
+    | `.mpg`, `.mpeg` | MPEG |
+    | `.vob` | DVD Video Object |
+  </Tab>
+</Tabs>
+
+## The file widget
+
+Each loaded file displays a card in the left panel with the following information:
+
+- **Filename** — the original name and extension of the file
+- **Preview thumbnail** — a small image preview of the file
+- **Duration** — for video files, the total duration in seconds
+- **AI input resolution** — the resolution that will be fed to the AI model, based on the current **Input Resolution %** setting
+- **AI output resolution** — the resolution produced by the AI model after upscaling
+- **File output resolution** — the final resolution of the saved file, based on the current **Output Resolution %** setting
+
+The resolution values update in real time as you change the **Input Resolution %** and **Output Resolution %** settings, so you can preview the effect of your settings before processing.
+
+<Tip>
+  Check the file output resolution before you click **UPSCALE** to confirm the final dimensions match what you need.
+</Tip>
+
+## Clearing the file list
+
+Click the **CLEAN** button to remove all loaded files and reset the file list. This does not delete your source files — it only clears them from the current QualityScaler session.

@@ -1,133 +1,61 @@
 ---
-title: "Introduction"
-description: "Welcome to the new home for your documentation"
-icon: 'star'
+title: "QualityScaler: AI image and video upscaler for Windows"
+description: "QualityScaler uses deep learning to upscale and enhance images and videos on Windows. Supports AMD, Intel, and NVIDIA GPUs with no internet connection required."
 ---
 
-## Setting up
+QualityScaler is a Windows desktop application that uses AI-powered deep learning models to upscale, enhance, and de-noise photographs and videos. It runs entirely on your PC — no cloud, no subscription, no internet connection required.
 
-Get your documentation site up and running in minutes.
-
-<Card
-  title="Start here"
-  icon="rocket"
-  href="/quickstart"
-  horizontal
->
-  Follow our three step quickstart guide.
-</Card>
-
-## Make it yours
-
-Design a docs site that looks great and empowers your users.
-
-<Columns cols={2}>
-  <Card
-    title="Edit locally"
-    icon="pen-to-square"
-    href="/development"
-  >
-    Edit your docs locally and preview them in real time.
+<CardGroup cols={2}>
+  <Card title="Installation" icon="download" href="/installation">
+    Download QualityScaler and set up dependencies to get the app running on your PC.
   </Card>
-  <Card
-    title="Customize your site"
-    icon="palette"
-    href="/essentials/settings"
-  >
-    Customize the design and colors of your site to match your brand.
+  <Card title="Quickstart" icon="rocket" href="/quickstart">
+    Upscale your first image or video in minutes with a step-by-step walkthrough.
   </Card>
-    <Card
-    title="Set up navigation"
-    icon="map"
-    href="/essentials/navigation"
-  >
-    Organize your docs to help users find what they need and succeed with your product.
+  <Card title="AI Models" icon="brain" href="/guides/ai-models">
+    Explore the available AI models and choose the right one for your content type.
   </Card>
-  <Card
-    title="API documentation"
-    icon="terminal"
-    href="/api-reference/introduction"
-  >
-    Auto-generate API documentation from OpenAPI specifications.
+  <Card title="System Requirements" icon="desktop" href="/reference/system-requirements">
+    Check hardware and software requirements before installing QualityScaler.
   </Card>
-</Columns>
+</CardGroup>
 
-## Create beautiful pages
+## What QualityScaler can do
 
-Everything you need to create world-class documentation.
+QualityScaler handles a wide range of enhancement tasks — from upscaling old photos to de-noising video footage — all powered by ONNX-based AI models running locally on your GPU.
 
-<Columns cols={2}>
-  <Card
-    title="Write with MDX"
-    icon="pen-fancy"
-    href="/essentials/markdown"
-  >
-    Use MDX to style your docs pages.
+<CardGroup cols={2}>
+  <Card title="Upscale images" icon="image" href="/guides/upscaling-images">
+    Enhance JPG, PNG, WEBP, HEIC, BMP, and TIFF files up to 4x their original resolution.
   </Card>
-  <Card
-    title="Code samples"
-    icon="code"
-    href="/essentials/code"
-  >
-    Add sample code to demonstrate how to use your product.
+  <Card title="Upscale videos" icon="film" href="/guides/upscaling-videos">
+    Process MP4, MKV, AVI, MOV, and more with multi-threaded frame upscaling and hardware-accelerated encoding.
   </Card>
-  <Card
-    title="Images"
-    icon="image"
-    href="/essentials/images"
-  >
-    Display images and other media.
+  <Card title="Choose your GPU" icon="microchip" href="/advanced/gpu-configuration">
+    Works with any DirectX 12 compatible GPU — AMD, Intel, or NVIDIA.
   </Card>
-  <Card
-    title="Reusable snippets"
-    icon="recycle"
-    href="/essentials/reusable-snippets"
-  >
-    Write once and reuse across your docs.
+  <Card title="Control output quality" icon="sliders" href="/guides/upscaling-settings">
+    Fine-tune input/output resolution scaling, AI blending, and tiling to match your VRAM.
   </Card>
-</Columns>
+</CardGroup>
 
-## Make your content agent ready
+## How it works
 
-Make your docs work for humans and AI agents alike.
+<Steps>
+  <Step title="Select your files">
+    Click **SELECT FILES** in the app to load images and/or videos you want to upscale. QualityScaler shows a preview of each file with its resolution.
+  </Step>
+  <Step title="Choose an AI model">
+    Pick the AI model that best fits your content — LVA for live-action video, RealESR for animation, BSRGAN for photos, or IRCNN for noise reduction.
+  </Step>
+  <Step title="Configure settings">
+    Set your input/output resolution scale, GPU, multithreading, blending level, and output format.
+  </Step>
+  <Step title="Start upscaling">
+    Click **UPSCALE** and QualityScaler processes your files. Progress is shown in real time, and video upscaling supports stop and resume.
+  </Step>
+</Steps>
 
-<Columns cols={2}>
-  <Card
-    title="Prompt component"
-    icon="robot"
-    href="/agent-ready/prompt"
-  >
-    Embed shareable AI prompts readers can copy or open in Cursor.
-  </Card>
-  <Card
-    title="Visibility"
-    icon="eye"
-    href="/agent-ready/visibility"
-  >
-    Show different content to humans and agents reading your docs.
-  </Card>
-  <Card
-    title="Contextual menu"
-    icon="bolt"
-    href="/agent-ready/contextual"
-  >
-    Give readers one-click access to Claude, ChatGPT, Cursor, and more.
-  </Card>
-  <Card
-    title="AI coding tools"
-    icon="wand-magic-sparkles"
-    href="/ai-tools/claude-code"
-  >
-    Set up Claude Code, Cursor, or Windsurf with Mintlify's skill.
-  </Card>
-</Columns>
-
-## Need inspiration?
-
-<Card
-  title="See complete examples"
-  icon="stars"
-  href="https://mintlify.com/customers"
->
-  Browse our showcase of exceptional documentation sites.
-</Card>
+<Note>
+  QualityScaler requires a DirectX 12 compatible GPU with at least 4 GB of VRAM and Windows 10 or Windows 11. See [System Requirements](/reference/system-requirements) for the full list.
+</Note>

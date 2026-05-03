@@ -1,0 +1,107 @@
+---
+title: 'How to upscale images with QualityScaler'
+description: 'Step-by-step walkthrough for upscaling images in QualityScaler, including model selection, resolution settings, blending, and locating your output files.'
+keywords: ['QualityScaler', 'upscale images', 'image upscaling', 'BSRGANx4', 'RealESRGAN', 'MSharp', 'how to upscale', 'photo upscaling']
+---
+
+QualityScaler can upscale individual images or batches of images in a single session. The process is straightforward: load your files, choose a model and settings, then click **UPSCALE**.
+
+## Before you start
+
+Make sure you have:
+
+- Installed QualityScaler and placed the `.onnx` model files in the `/AI-onnx` folder (see [Installation](/installation))
+- A GPU with enough VRAM for the model you plan to use (see [AI models](/guides/ai-models) for VRAM requirements)
+
+## Upscaling images step by step
+
+<Steps>
+  <Step title="Load your image files">
+    Click **SELECT FILES** in the left panel. Select one or more image files from your computer. QualityScaler supports `.jpg`, `.jpeg`, `.png`, `.webp`, `.bmp`, `.tif`, `.tiff`, and `.heic`.
+
+    Each loaded file appears as a card showing the filename, a preview thumbnail, and the current input and output resolution based on your settings.
+  </Step>
+
+  <Step title="Choose an AI model">
+    Open the **AI model** dropdown and select the model that best matches your content:
+
+    <CardGroup cols={2}>
+      <Card title="BSRGANx4" icon="image">
+        Best general-purpose model for photos. Low VRAM (0.75 GB), 4x scale.
+      </Card>
+      <Card title="BSRGANx2" icon="image">
+        Same quality as BSRGANx4 at 2x scale. Very low VRAM (0.8 GB).
+      </Card>
+      <Card title="RealESRGANx4" icon="magnifying-glass">
+        Best for images with fine detail such as fabric, foliage, or architecture. 4x scale, 0.75 GB VRAM.
+      </Card>
+      <Card title="MSharpx4" icon="wand-sparkles">
+        Adds sharpening on top of 4x upscaling. Use only on clean, already-sharp photos. 1.5 GB VRAM.
+      </Card>
+    </CardGroup>
+
+    For a first attempt, **BSRGANx4** is a reliable default.
+  </Step>
+
+  <Step title="Set Input Resolution %">
+    Leave **Input Resolution %** at `100` to process images at their original resolution. Lower this value (for example, `75` or `50`) if you have limited VRAM or want faster processing at the cost of some quality.
+  </Step>
+
+  <Step title="Set Output Resolution %">
+    Leave **Output Resolution %** at `100` to save the image at the full AI upscale resolution. Lower this value only if you need a specific smaller output size.
+  </Step>
+
+  <Step title="Set GPU VRAM">
+    Enter the amount of VRAM your GPU has in the **GPU VRAM** field. This allows QualityScaler to calculate the correct tile size for your hardware. Setting this accurately prevents out-of-memory errors.
+  </Step>
+
+  <Step title="Set AI Blending (optional)">
+    Leave **AI Blending** at **OFF** for clean, fully upscaled output. If your source images are heavily compressed or low quality, try **Low** blending to reduce over-processing artifacts.
+  </Step>
+
+  <Step title="Choose the image output extension">
+    In the output settings, select your preferred format: `.png` for lossless output, `.jpg` for smaller files, or `.bmp`/`.tiff` for uncompressed/maximum compatibility.
+  </Step>
+
+  <Step title="Click UPSCALE">
+    Click the **UPSCALE** button. A progress indicator appears in the UI. For most images, processing takes a few seconds per file depending on resolution and your GPU.
+
+    When processing is complete, the status indicator updates to confirm the job is done.
+  </Step>
+
+  <Step title="Find your output files">
+    By default, output files are saved in the same folder as the input files. The filename follows this pattern:
+
+    ```text
+    <original_name>_<AI_model>_InputR-<input%>_OutputR-<output%>[_Blending-Low/Medium/High].<ext>
+    ```
+
+    For example, upscaling `cat.jpg` with `BSRGANx4` at default settings produces:
+
+    ```text
+    cat_BSRGANx4_InputR-100_OutputR-100.png
+    ```
+
+    You can change the output folder in the [output settings](/guides/output-settings).
+  </Step>
+</Steps>
+
+## Tips for image upscaling
+
+<AccordionGroup>
+  <Accordion title="Which model should I use for photos?">
+    **BSRGANx4** is the safest general choice. It requires minimal VRAM and handles a wide range of photo types well. Use **RealESRGANx4** if your photos have a lot of fine texture detail you want to preserve. Use **MSharpx4** only on high-quality originals where you specifically want sharper edges.
+  </Accordion>
+
+  <Accordion title="My output has artifacts or over-sharpened edges">
+    Try enabling **AI Blending** at **Low** or **Medium**. This mixes the upscaled result with the original, which reduces over-processing on compressed or noisy inputs. You can also try switching from **RealESRGANx4** to **BSRGANx4**, which is less aggressive.
+  </Accordion>
+
+  <Accordion title="Processing is very slow or crashing">
+    Lower **Input Resolution %** to `75` or `50`. This reduces the resolution fed to the AI model, which lowers VRAM pressure and speeds up tiling. Also verify that **GPU VRAM** is set to the actual capacity of your GPU.
+  </Accordion>
+
+  <Accordion title="Can I process an entire folder of images at once?">
+    Yes. Use **SELECT FILES** to select multiple images in the same dialog. All selected files will be queued and upscaled in sequence when you click **UPSCALE**.
+  </Accordion>
+</AccordionGroup>

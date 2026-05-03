@@ -1,0 +1,111 @@
+---
+title: 'Install QualityScaler on Windows'
+description: 'Two ways to get QualityScaler running on Windows: download the pre-built app from itch.io or Steam, or run it from the Python source code.'
+keywords: ['QualityScaler', 'install', 'setup', 'Windows', 'itch.io', 'Steam', 'run from source', 'Python', 'requirements']
+---
+
+QualityScaler runs on Windows 10 and Windows 11. You can either download the pre-built application from a storefront or run the project directly from its Python source code. The pre-built option is recommended for most users.
+
+<Note>
+  Regardless of which installation path you choose, you must download the AI model files separately and place them in the `/AI-onnx` folder. See the steps below for details.
+</Note>
+
+## System requirements
+
+| Component | Minimum |
+|-----------|---------|
+| Operating system | Windows 10 or Windows 11 |
+| GPU | Any DirectX 12 compatible GPU (AMD, Intel, or NVIDIA) |
+| VRAM | 4 GB or more |
+| RAM | 8 GB or more |
+
+For the full requirements reference, see [System Requirements](/reference/system-requirements).
+
+## Option 1: Download the pre-built app (recommended)
+
+The pre-built release includes everything except the AI model files and ffmpeg, which must be downloaded separately.
+
+<Steps>
+  <Step title="Download QualityScaler">
+    Download the application from one of the two official storefronts:
+
+    - **itch.io**: [jangystudio.itch.io/qualityscaler](https://jangystudio.itch.io/qualityscaler)
+    - **Steam**: [store.steampowered.com/app/2463110/QualityScaler](https://store.steampowered.com/app/2463110/QualityScaler/)
+
+    Extract the downloaded archive to a folder of your choice.
+  </Step>
+  <Step title="Download AI models">
+    Download the AI model files from [gofile.io/d/b4Ds9u](https://gofile.io/d/b4Ds9u) and extract the `.onnx` files into the `/AI-onnx` folder inside your QualityScaler directory.
+
+    Without these files, the application will open but will not be able to upscale anything.
+  </Step>
+  <Step title="Download ffmpeg">
+    Download the ffmpeg release build from [gyan.dev/ffmpeg/builds](https://www.gyan.dev/ffmpeg/builds/) — choose the **ffmpeg-release-essentials.7z** archive. Extract `ffmpeg.exe` and place it in the `/Assets` folder inside your QualityScaler directory.
+
+    ffmpeg is required for all video upscaling. Image upscaling works without it.
+  </Step>
+  <Step title="Launch QualityScaler">
+    Run `QualityScaler.exe`. The application window will open and you are ready to upscale.
+  </Step>
+</Steps>
+
+## Option 2: Run from source
+
+This path is intended for developers who want to inspect or modify the code. It requires Python and VSCode.
+
+<Steps>
+  <Step title="Install Python">
+    Download and install Python from [python.org/downloads](https://www.python.org/downloads/). Python 3.12 is recommended for best performance.
+
+    During installation, check **Add Python to PATH**.
+  </Step>
+  <Step title="Install VSCode">
+    Download and install Visual Studio Code from [code.visualstudio.com](https://code.visualstudio.com/). When you first open a `.py` file, VSCode will prompt you to install the Python extension — accept the prompt.
+  </Step>
+  <Step title="Download the project">
+    Download the repository as a ZIP from GitHub (green **Code** button → **Download ZIP**) and extract it to a folder on your PC.
+  </Step>
+  <Step title="Download and place AI models">
+    Download the AI model files from [gofile.io/d/b4Ds9u](https://gofile.io/d/b4Ds9u) and extract the `.onnx` files into the `/AI-onnx` folder inside the extracted project directory.
+  </Step>
+  <Step title="Download and place ffmpeg">
+    Download `ffmpeg-release-essentials.7z` from [gyan.dev/ffmpeg/builds](https://www.gyan.dev/ffmpeg/builds/), extract `ffmpeg.exe`, and place it in the `/Assets` folder inside the project directory.
+  </Step>
+  <Step title="Open the project in VSCode">
+    Drag and drop the project folder onto the VSCode window, or use **File → Open Folder**.
+  </Step>
+  <Step title="Install Python dependencies">
+    Open the **Terminal** panel in VSCode and run:
+
+    ```bash
+    pip install -r requirements.txt
+    ```
+
+    The `requirements.txt` file contains:
+
+    ```text
+    #AI
+    onnxruntime-directml==1.24.4
+    numpy
+
+    #GUI
+    customtkinter
+
+    #UTILS
+    opencv-python-headless
+    Pillow
+    natsort
+    psutil
+    pyinstaller==6.19.0
+    ```
+
+    After installation completes, close and re-open VSCode to refresh the installed packages.
+  </Step>
+  <Step title="Run QualityScaler.py">
+    Click on `QualityScaler.py` in the VSCode file explorer, then click the **Play** button in the upper-right corner of the editor. The application window will open.
+  </Step>
+</Steps>
+
+<Warning>
+  Do not skip the close-and-reopen step after running `pip install`. VSCode caches the Python environment at startup, and newly installed packages may not be recognized until it restarts.
+</Warning>

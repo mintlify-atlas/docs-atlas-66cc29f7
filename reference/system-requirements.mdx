@@ -1,0 +1,76 @@
+---
+title: "System requirements for QualityScaler"
+description: "Minimum and recommended hardware and software requirements to run QualityScaler on Windows, including GPU compatibility and storage guidance."
+---
+
+QualityScaler runs on Windows and uses DirectX 12 for GPU-accelerated AI inference via Microsoft's DirectML. Before installing, confirm your system meets the requirements below.
+
+## Minimum requirements
+
+| Component | Minimum |
+|---|---|
+| Operating System | Windows 10 or Windows 11 |
+| RAM | 8 GB |
+| GPU | Any DirectX 12 compatible GPU |
+| GPU VRAM | 4 GB |
+| Storage | Sufficient free space for output files and temporary video frames |
+
+<Warning>
+  QualityScaler does not run on macOS or Linux. It requires Windows and a DirectX 12 capable GPU.
+</Warning>
+
+## Recommended configuration
+
+| Component | Recommended |
+|---|---|
+| Operating System | Windows 11 |
+| RAM | 16 GB or more |
+| GPU VRAM | 8 GB or more |
+| Storage | SSD for faster frame extraction and video encoding |
+
+More VRAM allows QualityScaler to process larger images and videos without tiling, which is faster and avoids any potential tile boundary artifacts.
+
+## Compatible GPUs
+
+QualityScaler uses the `onnxruntime-directml` backend, which runs on any GPU that supports DirectX 12. This includes:
+
+<CardGroup cols={2}>
+  <Card title="NVIDIA" icon="microchip">
+    GTX 10-series (Pascal) and newer. RTX cards additionally support hardware NVENC encoding for faster video output.
+  </Card>
+  <Card title="AMD" icon="microchip">
+    RX 400-series (Polaris) and newer. Supports hardware AMF encoding for faster video output.
+  </Card>
+  <Card title="Intel Arc" icon="microchip">
+    All Intel Arc discrete GPUs. Supports hardware Quick Sync (QSV) encoding.
+  </Card>
+  <Card title="Intel UHD / Iris Xe" icon="microchip">
+    Intel integrated graphics are supported but will be significantly slower than discrete GPUs. Not recommended for video upscaling.
+  </Card>
+</CardGroup>
+
+<Tip>
+  If your PC has both integrated Intel graphics and a dedicated GPU, select **GPU 1** or use **Auto** in the GPU menu to ensure QualityScaler uses the dedicated card.
+</Tip>
+
+## Storage considerations
+
+Video upscaling extracts every frame to disk before processing. Storage requirements scale with video length and resolution:
+
+- A 1-minute 1080p video at 24 fps = ~1,440 frames
+- Each frame at ~500 KB (JPEG quality 1) = ~720 MB of temporary storage
+
+After encoding, the frames folder is deleted automatically unless you enable **Keep Frames**. Make sure you have at least 2–3× the size of your source video as free space during processing.
+
+## Software dependencies (pre-built app)
+
+The pre-built QualityScaler release includes `exiftool.exe`. You must also download `ffmpeg.exe` separately from [gyan.dev/ffmpeg/builds](https://www.gyan.dev/ffmpeg/builds/) (choose **ffmpeg-release-essentials.7z**) and place it in the `Assets/` folder. See [Installation](/installation) for the full setup steps.
+
+## Software dependencies (running from source)
+
+If you are running QualityScaler from the Python source:
+
+- Python 3.12 or later
+- All packages in `requirements.txt` (installed via `pip install -r requirements.txt`)
+- `ffmpeg.exe` placed in the `Assets/` folder
+- AI model `.onnx` files placed in the `AI-onnx/` folder

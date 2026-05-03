@@ -1,0 +1,94 @@
+---
+title: 'Upscaling settings: resolution, VRAM, and blending'
+description: 'Configure input/output resolution percentages, GPU VRAM, AI multithreading, AI blending, and app zoom in QualityScaler for best results.'
+keywords: ['QualityScaler', 'upscaling settings', 'input resolution', 'output resolution', 'VRAM', 'AI blending', 'multithreading', 'app zoom']
+---
+
+QualityScaler exposes several settings that control how files are processed and how the AI model interacts with your GPU. Understanding these settings lets you tune the balance between speed, quality, and memory usage.
+
+## Input Resolution %
+
+**Input Resolution %** scales the source file before it is passed to the AI model. The default value is `100`, which means the file is processed at its original resolution.
+
+- Lowering this value (for example, to `50`) reduces the resolution fed to the AI, which speeds up processing and lowers VRAM pressure.
+- Higher input resolution values produce better output quality but take longer to process.
+
+<Tip>
+  If QualityScaler is running out of VRAM or processing is very slow, try reducing **Input Resolution %** to `75` or `50` before adjusting other settings.
+</Tip>
+
+## Output Resolution %
+
+**Output Resolution %** scales the AI output before it is saved to disk. The default is `100`, which saves the image at the full upscaled resolution.
+
+- Set this below `100` to produce a final file that is smaller than the AI model's native output. For example, if you upscale a 1080p video with a 4x model but only need 1440p output, set **Output Resolution %** to `33`.
+- This does not affect processing speed or VRAM — the AI still runs at full scale and the resize is applied at the end.
+
+## GPU VRAM
+
+The **GPU VRAM** value (in gigabytes) tells QualityScaler how much video memory is available on your GPU. QualityScaler uses this value to calculate the tile size (in pixels) used when processing each image or video frame:
+
+```text
+tiles_resolution = int(vram_gb × model_vram_multiplier × 100)
+```
+
+This gives the side length in pixels of each square tile. A higher value means fewer, larger tiles and faster processing. Each model has a different VRAM multiplier. For reference:
+
+| Model | VRAM multiplier |
+|-------|----------------|
+| `LVAx2` | 2.0 |
+| `RealESR_Gx4` | 2.5 |
+| `RealESR_Ax4` | 2.5 |
+| `BSRGANx2` | 0.8 |
+| `BSRGANx4` | 0.75 |
+| `RealESRGANx4` | 0.75 |
+| `MSharpx4` | 1.5 |
+| `IRCNN_Mx1` | 4.0 |
+| `IRCNN_Lx1` | 4.0 |
+
+Set **GPU VRAM** to the actual VRAM capacity of your GPU. If you experience out-of-memory errors, lower this value slightly to force smaller tiles.
+
+<Warning>
+  Setting **GPU VRAM** higher than your actual GPU VRAM can cause out-of-memory errors and crashes during processing.
+</Warning>
+
+## AI Multithreading
+
+**AI Multithreading** controls how many parallel threads are used to process video frames. It has no effect on single images.
+
+| Option | Threads |
+|--------|---------|
+| OFF | 1 (sequential) |
+| 2 threads | 2 |
+| 4 threads | 4 |
+| 6 threads | 6 |
+| 8 threads | 8 |
+
+More threads speed up video processing at the cost of higher VRAM and CPU usage. If your GPU runs out of memory during video upscaling, reduce the thread count.
+
+<Note>
+  Multithreading is most effective on GPUs with large VRAM. On 4–6 GB GPUs, start with 2 threads and increase only if processing is stable.
+</Note>
+
+## AI Blending
+
+**AI Blending** mixes the upscaled output with the original source image. This can reduce artifacts on low-resolution or heavily compressed inputs where the AI model over-processes details.
+
+| Setting | Original | Upscaled |
+|---------|----------|----------|
+| OFF | 0% | 100% |
+| Low | 30% | 70% |
+| Medium | 50% | 50% |
+| High | 70% | 30% |
+
+<Tip>
+  Use **Low** blending for animation or anime content to preserve flat color areas. Use **OFF** for de-noising with IRCNN models — blending would reintroduce the original noise.
+</Tip>
+
+## App Zoom
+
+**App Zoom** adjusts the scale of the QualityScaler user interface. This setting does not affect processing or output quality — it only changes how large the application window appears on screen.
+
+Available zoom levels: `50%`, `75%`, `100%`, `125%`, `150%`, `175%`
+
+Use a higher zoom level on high-DPI or 4K displays where the default UI appears too small.

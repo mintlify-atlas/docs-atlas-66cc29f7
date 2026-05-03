@@ -1,0 +1,85 @@
+---
+title: 'Configure GPU acceleration in QualityScaler'
+description: 'Select between Auto and GPU 1–4 modes, set GPU VRAM, and understand how DirectML enables AMD, Intel, and NVIDIA hardware acceleration.'
+keywords: ['QualityScaler', 'GPU', 'DirectML', 'DirectX 12', 'GPU selection', 'VRAM', 'AMD', 'Intel', 'NVIDIA', 'onnxruntime-directml']
+---
+
+QualityScaler runs all AI inference through [onnxruntime-directml](https://onnxruntime.ai/docs/execution-providers/DirectML-ExecutionProvider.html), which uses the `DmlExecutionProvider` backend. This means any GPU that supports DirectX 12 — including AMD Radeon, Intel Arc, Intel UHD, and NVIDIA GeForce — can accelerate upscaling without driver-specific plugins.
+
+## How GPU selection works
+
+The GPU dropdown has five options: **Auto** and **GPU 1** through **GPU 4**. Each maps to a DirectML device selection at the point the ONNX inference session is created.
+
+| Option | DirectML behavior |
+|--------|------------------|
+| Auto | `performance_preference: high_performance` — DirectML picks the fastest available GPU |
+| GPU 1 | `device_id: 0` — targets the first enumerated DirectX 12 adapter |
+| GPU 2 | `device_id: 1` — targets the second enumerated DirectX 12 adapter |
+| GPU 3 | `device_id: 2` — targets the third enumerated DirectX 12 adapter |
+| GPU 4 | `device_id: 3` — targets the fourth enumerated DirectX 12 adapter |
+
+**Auto** is the right choice for most users. It instructs DirectML to prefer the highest-performance adapter, which is typically the dedicated GPU on systems that have both integrated and discrete graphics.
+
+Use **GPU 1–4** when you have multiple GPUs and need to target a specific one — for example, to avoid using a weak integrated GPU, or to distribute workload across two dedicated cards by running separate QualityScaler sessions.
+
+<Note>
+  The adapter order reported by DirectX may not match the order shown in Windows Device Manager. If the wrong GPU is being used, switch from **Auto** to a specific **GPU 1–4** slot and check the task manager GPU graph to confirm which adapter is active.
+</Note>
+
+## Setting the correct GPU VRAM value
+
+The **GPU VRAM** field (in gigabytes) tells QualityScaler how much video memory to assume is available. This value is used to calculate the maximum tile size for each AI model:
+
+```text
+tiles_resolution = int(vram_gb × model_vram_multiplier × 100) × 100
+```
+
+Enter the actual VRAM capacity of the GPU you are using. Setting this value higher than your real VRAM will cause out-of-memory errors during upscaling.
+
+### How to check your GPU's VRAM on Windows
+
+<Steps>
+  <Step title="Open Task Manager">
+    Press `Ctrl + Shift + Esc` to open Task Manager.
+  </Step>
+  <Step title="Go to the Performance tab">
+    Click the **Performance** tab in the left sidebar.
+  </Step>
+  <Step title="Select your GPU">
+    Click the **GPU** entry. If you have multiple GPUs, each will appear as a separate item (GPU 0, GPU 1, and so on).
+  </Step>
+  <Step title="Read the dedicated VRAM">
+    Look for the **Dedicated GPU memory** value. Use this number (in GB) as the **GPU VRAM** setting in QualityScaler.
+
+    Do not use the **Shared GPU memory** value — that is system RAM and is not usable for AI inference.
+  </Step>
+</Steps>
+
+## GPU compatibility notes
+
+<CardGroup cols={2}>
+  <Card title="NVIDIA GeForce" icon="microchip">
+    Fully supported via DirectX 12. All modern GeForce cards (GTX 10 series and later) work. NVENC hardware encoding is also available for the video codec step.
+  </Card>
+  <Card title="AMD Radeon" icon="microchip">
+    Fully supported via DirectX 12. RX 400 series and newer. AMF hardware encoding is available for video output.
+  </Card>
+  <Card title="Intel Arc" icon="microchip">
+    Fully supported via DirectX 12. Intel Arc A-series and later. Quick Sync (QSV) encoding is available for video output.
+  </Card>
+  <Card title="Intel UHD / Iris Xe" icon="microchip">
+    Supported via DirectX 12, but integrated graphics share memory with the CPU. Set **GPU VRAM** to the dedicated GPU memory shown in Task Manager, which will typically be 0–2 GB. Processing will be slower than a dedicated GPU.
+  </Card>
+</CardGroup>
+
+<Warning>
+  Integrated Intel graphics (UHD, Iris Xe) share memory with system RAM rather than having dedicated VRAM. If Task Manager shows 0 MB dedicated GPU memory, set **GPU VRAM** to a conservative value such as `1` to avoid out-of-memory errors, and expect slower performance compared to a dedicated card.
+</Warning>
+
+## Multi-GPU systems
+
+On laptops or desktops with both an integrated GPU and a dedicated GPU, **Auto** mode will typically select the dedicated GPU. If it does not, you can force the dedicated card by selecting **GPU 1** or **GPU 2** and verifying in Task Manager which adapter's utilization increases when you start upscaling.
+
+<Tip>
+  If you own two dedicated GPUs, you can run two separate QualityScaler instances — one set to **GPU 1** and one to **GPU 2** — to process different files simultaneously on each card.
+</Tip>

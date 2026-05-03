@@ -1,0 +1,149 @@
+---
+title: "AI model reference — QualityScaler"
+description: "Complete reference for all nine AI models in QualityScaler: scale factor, minimum VRAM, target use case, credits, and selection guidance."
+---
+
+QualityScaler ships with nine AI models stored as FP16 ONNX files in the `AI-onnx` folder. Each model is optimized for a specific task — choosing the right one for your content type makes a significant difference in quality and speed.
+
+## Quick reference
+
+| Model | Scale | Min VRAM | Best for |
+|---|---|---|---|
+| LVAx2 | 2x | 2 GB | Live-action video |
+| RealESR_Gx4 | 4x | 2.5 GB | Animation / degraded video |
+| RealESR_Ax4 | 4x | 2.5 GB | Animation / degraded video |
+| BSRGANx2 | 2x | 0.8 GB | High-quality photos |
+| BSRGANx4 | 4x | 0.75 GB | High-quality photos |
+| RealESRGANx4 | 4x | 0.75 GB | High-quality photos |
+| MSharpx4 | 4x | 1.5 GB | Sharp, low-noise photos |
+| IRCNN_Mx1 | 1x | 4 GB | Video / image denoising |
+| IRCNN_Lx1 | 1x | 4 GB | Video / image denoising (strong) |
+
+<Note>
+  The IRCNN models do not upscale — they output the same resolution as the input. Their purpose is noise reduction and artifact removal.
+</Note>
+
+## Model details
+
+<AccordionGroup>
+  <Accordion title="LVAx2 — Live-action video upscaling">
+    **Scale**: 2x | **Min VRAM**: 2 GB
+
+    LVAx2 is designed for live-action video footage. It produces natural-looking 2x upscales while preserving realistic textures and detail.
+
+    **Recommended blending**: OFF or Low. Higher blending levels can soften the result unnecessarily for live-action content.
+
+    **ONNX file**: `LVAx2_fp16.onnx`
+  </Accordion>
+
+  <Accordion title="RealESR_Gx4 — Animated and degraded video">
+    **Scale**: 4x | **Min VRAM**: 2.5 GB
+
+    RealESR_Gx4 is a general-purpose Real-ESRGAN model tuned for animated content and degraded live-action video. It handles compression artifacts well.
+
+    **Recommended blending**: Low for animation, Medium or High for degraded live-action footage.
+
+    **Credit**: Based on [Real-ESRGAN](https://github.com/xinntao/Real-ESRGAN) by xinntao.
+
+    **ONNX file**: `RealESR_Gx4_fp16.onnx`
+  </Accordion>
+
+  <Accordion title="RealESR_Ax4 — Animated and degraded video (anime)">
+    **Scale**: 4x | **Min VRAM**: 2.5 GB
+
+    RealESR_Ax4 is the anime-focused variant of Real-ESRGAN. It excels at restoring clean lines and flat shading typical in anime and animated content.
+
+    **Recommended blending**: Low for animation, Medium or High for degraded live-action.
+
+    **Credit**: Based on [Real-ESRGAN](https://github.com/xinntao/Real-ESRGAN) by xinntao.
+
+    **ONNX file**: `RealESR_Ax4_fp16.onnx`
+  </Accordion>
+
+  <Accordion title="BSRGANx2 — High-quality image upscaling (2x)">
+    **Scale**: 2x | **Min VRAM**: 0.8 GB
+
+    BSRGANx2 is a blind super-resolution model optimized for high-quality photo upscaling at 2x. Its low VRAM requirement makes it a good choice on GPU-constrained systems.
+
+    **Tips**: Can be used on videos, but will be significantly slower than LVA or RealESR models.
+
+    **Credit**: Based on [BSRGAN](https://github.com/cszn/BSRGAN) by cszn.
+
+    **ONNX file**: `BSRGANx2_fp16.onnx`
+  </Accordion>
+
+  <Accordion title="BSRGANx4 — High-quality image upscaling (4x)">
+    **Scale**: 4x | **Min VRAM**: 0.75 GB
+
+    BSRGANx4 delivers high-quality 4x image upscaling with very low VRAM usage, making it one of the most accessible models for large images.
+
+    **Tips**: Excellent for photos with moderate noise. Can be used on videos but will be slow.
+
+    **Credit**: Based on [BSRGAN](https://github.com/cszn/BSRGAN) by cszn.
+
+    **ONNX file**: `BSRGANx4_fp16.onnx`
+  </Accordion>
+
+  <Accordion title="RealESRGANx4 — High-quality image upscaling">
+    **Scale**: 4x | **Min VRAM**: 0.75 GB
+
+    RealESRGANx4 is the original Real-ESRGAN model, optimized for photo upscaling with strong detail recovery. It handles real-world degradations including blur, noise, and compression.
+
+    **Tips**: Can be used on videos but will be slower than video-optimized models.
+
+    **Credit**: Based on [Real-ESRGAN](https://github.com/xinntao/Real-ESRGAN) by xinntao.
+
+    **ONNX file**: `RealESRGANx4_fp16.onnx`
+  </Accordion>
+
+  <Accordion title="MSharpx4 — Image sharpening and upscaling">
+    **Scale**: 4x | **Min VRAM**: 1.5 GB
+
+    MSharpx4 combines 4x upscaling with strong sharpening. It produces very crisp results on already high-quality photos.
+
+    **Tips**: Use on photos with good original quality and minimal noise. Applying MSharpx4 to noisy images can amplify the noise.
+
+    **ONNX file**: `MSharpx4_fp16.onnx`
+  </Accordion>
+
+  <Accordion title="IRCNN_Mx1 — Image and video denoising (medium)">
+    **Scale**: 1x (no upscaling) | **Min VRAM**: 4 GB
+
+    IRCNN_Mx1 is a convolutional denoising model that removes noise and compression artifacts without changing resolution. It applies medium-strength denoising.
+
+    **Recommended blending**: OFF. Blending a denoised image with the original reintroduces noise.
+
+    **Credit**: Based on [IRCNN](https://github.com/lipengFu/IRCNN).
+
+    **ONNX file**: `IRCNN_Mx1_fp16.onnx`
+  </Accordion>
+
+  <Accordion title="IRCNN_Lx1 — Image and video denoising (large/strong)">
+    **Scale**: 1x (no upscaling) | **Min VRAM**: 4 GB
+
+    IRCNN_Lx1 applies stronger denoising than IRCNN_Mx1. Use it for heavily compressed or very noisy source material.
+
+    **Recommended blending**: OFF.
+
+    **Credit**: Based on [IRCNN](https://github.com/lipengFu/IRCNN).
+
+    **ONNX file**: `IRCNN_Lx1_fp16.onnx`
+  </Accordion>
+</AccordionGroup>
+
+## Choosing a model by use case
+
+<CardGroup cols={2}>
+  <Card title="Upscaling photos" icon="image">
+    Use **BSRGANx4** for general photos, **RealESRGANx4** for high detail recovery, or **MSharpx4** for clean, low-noise images that need sharpening.
+  </Card>
+  <Card title="Upscaling live-action video" icon="film">
+    Use **LVAx2** for natural-looking 2x video upscaling. For 4x, try **RealESR_Gx4** with Medium or High blending.
+  </Card>
+  <Card title="Upscaling anime and animation" icon="wand-magic-sparkles">
+    Use **RealESR_Ax4** for anime or **RealESR_Gx4** for general animation. Set blending to Low to preserve the animated look.
+  </Card>
+  <Card title="Removing noise" icon="eraser">
+    Use **IRCNN_Mx1** for moderate noise removal or **IRCNN_Lx1** for heavy compression artifacts. Set blending to OFF.
+  </Card>
+</CardGroup>

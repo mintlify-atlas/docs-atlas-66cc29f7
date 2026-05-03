@@ -1,0 +1,163 @@
+---
+title: 'How to upscale videos with QualityScaler'
+description: 'Complete guide to video upscaling in QualityScaler: frame extraction, multithreaded AI processing, codec selection, stop and resume, and output options.'
+keywords: ['QualityScaler', 'upscale video', 'video upscaling', 'LVAx2', 'RealESR', 'multithreading', 'stop resume', 'video codec', 'ffmpeg']
+---
+
+Video upscaling in QualityScaler works by extracting every frame with ffmpeg, running each frame through the AI model, and then re-encoding the result. This page explains the full process, all relevant settings, and how to pause and resume long jobs.
+
+## Before you start
+
+Make sure you have:
+
+- Installed QualityScaler and placed the `.onnx` model files in the `/AI-onnx` folder (see [Installation](/installation))
+- Enough free disk space for extracted frames — a one-minute 1080p video at 24 fps produces roughly 1,440 frames
+- A GPU with at least the VRAM listed for your chosen model (see [AI models](/guides/ai-models))
+
+## How video upscaling works
+
+QualityScaler processes video in three stages:
+
+1. **Frame extraction** — ffmpeg splits the video into individual image frames stored temporarily on disk.
+2. **AI upscaling** — the selected AI model upscales each frame, optionally using multiple parallel threads.
+3. **Re-encoding** — ffmpeg reassembles the upscaled frames into a video file using the selected codec and container.
+
+## Upscaling a video step by step
+
+<Steps>
+  <Step title="Load your video file">
+    Click **SELECT FILES** and select a video file. QualityScaler supports `.mp4`, `.mkv`, `.avi`, `.mov`, `.webm`, `.flv`, `.gif`, `.m4v`, `.qt`, `.3gp`, `.mpg`, `.mpeg`, and `.vob`.
+
+    The file card shows the filename, a preview thumbnail, the video duration, and the current AI input and output resolutions based on your settings.
+  </Step>
+
+  <Step title="Choose an AI model">
+    Select the model that matches your video content:
+
+    <CardGroup cols={2}>
+      <Card title="LVAx2" icon="video">
+        Live-action footage (people, environments, real-world content). 2x scale, 2 GB VRAM.
+      </Card>
+      <Card title="RealESR_Gx4" icon="film">
+        Animation, anime, or degraded/compressed video. 4x scale, 2.5 GB VRAM.
+      </Card>
+      <Card title="RealESR_Ax4" icon="film">
+        Alternative to RealESR_Gx4 for animation and degraded video. 4x scale, 2.5 GB VRAM.
+      </Card>
+      <Card title="IRCNN_Mx1 / IRCNN_Lx1" icon="wand-magic-sparkles">
+        De-noising without upscaling (1x scale). 4 GB VRAM. Set blending to OFF.
+      </Card>
+    </CardGroup>
+  </Step>
+
+  <Step title="Set Input Resolution %">
+    Leave at `100` for full-resolution processing. Lower to `75` or `50` if VRAM is limited or processing is too slow. This resizes each frame before it enters the AI model.
+  </Step>
+
+  <Step title="Set Output Resolution %">
+    Leave at `100` to save the video at the full AI upscale resolution. Lower this only if you want a specific output resolution smaller than the native AI output.
+  </Step>
+
+  <Step title="Set GPU VRAM">
+    Enter your GPU's VRAM capacity. QualityScaler uses this to tile frames correctly. Inaccurate values can cause out-of-memory errors or unnecessarily slow tiling.
+  </Step>
+
+  <Step title="Set AI Multithreading">
+    Choose how many parallel threads to use for frame upscaling:
+
+    | Setting | Threads | When to use |
+    |---------|---------|-------------|
+    | OFF | 1 | Low VRAM GPUs or stability issues |
+    | 2 threads | 2 | A safe default for most GPUs |
+    | 4 threads | 4 | Mid-range GPUs with 6–8 GB VRAM |
+    | 6 threads | 6 | High-end GPUs |
+    | 8 threads | 8 | High-end GPUs with 10+ GB VRAM |
+
+    More threads reduce total processing time but increase VRAM usage. If you see out-of-memory errors, reduce the thread count.
+  </Step>
+
+  <Step title="Set AI Blending (optional)">
+    For live-action video with **LVAx2**, leave blending at **OFF** or set it to **Low** to preserve natural texture. For animation with **RealESR_Gx4**, **Low** blending keeps flat color areas clean.
+
+    Always set blending to **OFF** when using **IRCNN_Mx1** or **IRCNN_Lx1** — blending reintroduces the noise you are removing.
+  </Step>
+
+  <Step title="Choose video output extension and codec">
+    Select your output container (`.mp4`, `.mkv`, `.avi`, or `.mov`) and your video codec. Use a hardware-accelerated codec if your GPU supports it:
+
+    - **NVIDIA**: `h264_nvenc` or `hevc_nvenc`
+    - **AMD**: `h264_amf` or `hevc_amf`
+    - **Intel**: `h264_qsv` or `hevc_qsv`
+    - **Any GPU / CPU**: `x264` or `x265`
+
+    See [Output settings](/guides/output-settings) for a full codec reference.
+  </Step>
+
+  <Step title="Click UPSCALE">
+    Click the **UPSCALE** button. QualityScaler begins frame extraction immediately. Progress is shown as a percentage with an estimated time remaining.
+
+    During processing, the status area updates continuously as frames are completed.
+  </Step>
+
+  <Step title="Find your output file">
+    The output video is saved to the same folder as the input file by default. The filename follows this pattern:
+
+    ```text
+    <original_name>_<AI_model>_InputR-<input%>_OutputR-<output%>[_Blending-Low/Medium/High].<ext>
+    ```
+
+    For example:
+
+    ```text
+    clip_LVAx2_InputR-100_OutputR-100.mp4
+    anime_RealESR_Gx4_InputR-100_OutputR-100_Blending-Low.mkv
+    ```
+  </Step>
+</Steps>
+
+## Stopping and resuming
+
+You can stop a video upscaling job at any time and resume it later without losing progress.
+
+<Steps>
+  <Step title="Stop the job">
+    Click the **STOP** button during processing. QualityScaler stops after completing the current frame. The extracted and already-upscaled frames remain on disk.
+  </Step>
+  <Step title="Resume from where you left off">
+    Load the same video file again with the same settings and click **UPSCALE**. QualityScaler detects the existing frames on disk and skips any frames that have already been upscaled, resuming from the last completed frame.
+  </Step>
+</Steps>
+
+<Note>
+  Stop and resume only works if you use the same input file and the same settings. Changing the AI model or resolution percentages between sessions means frames must be re-processed from the beginning.
+</Note>
+
+## Keep Frames
+
+By default, extracted video frames are deleted after the output video is encoded. Enable **Keep Frames** in the output settings to retain them on disk.
+
+Use this when you need the individual upscaled frames for compositing or further editing in another application.
+
+## Tips for video upscaling
+
+<AccordionGroup>
+  <Accordion title="Which model should I use for live-action video?">
+    Use **LVAx2**. It is specifically trained for real-world footage and applies a 2x scale, which keeps the result looking natural. Set blending to **OFF** or **Low**.
+  </Accordion>
+
+  <Accordion title="Which model should I use for anime or animation?">
+    Use **RealESR_Gx4** or **RealESR_Ax4**. Both are trained for animated and degraded video content. Set blending to **Low** to avoid breaking flat color fills.
+  </Accordion>
+
+  <Accordion title="Processing is very slow">
+    Increase **AI Multithreading** if your GPU has enough VRAM. If you are already at the maximum threads, try lowering **Input Resolution %** to `75` to reduce the per-frame workload. Using a hardware-accelerated codec (NVENC, AMF, QSV) also speeds up the final encoding step.
+  </Accordion>
+
+  <Accordion title="The output video has flickering or artifacts between frames">
+    Avoid using **MSharpx4** for video — its sharpening can cause inconsistencies between frames. Switch to **LVAx2** or one of the **RealESR** models. Also try reducing **AI Blending** to **OFF** if blending is enabled.
+  </Accordion>
+
+  <Accordion title="Can I upscale a GIF?">
+    Yes. QualityScaler supports `.gif` as an input format. The output will be encoded as a video file in the container you select. Note that the output will not be a GIF — you will need to convert it back to GIF with another tool if required.
+  </Accordion>
+</AccordionGroup>

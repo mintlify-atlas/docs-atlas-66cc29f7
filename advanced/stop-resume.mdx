@@ -1,0 +1,110 @@
+---
+title: 'Stop and resume video upscaling'
+description: 'Stop a long video upscaling job at any time and resume it later without re-processing frames — how QualityScaler detects and skips completed frames.'
+keywords: ['QualityScaler', 'stop upscaling', 'resume upscaling', 'pause video', 'upscaling progress', 'keep frames', 'frames folder']
+---
+
+Video upscaling can take hours for long files at high resolution. QualityScaler lets you stop the job at any point and resume it later from exactly where you left off, without re-extracting or re-upscaling any frame that was already completed.
+
+## How stop and resume works
+
+When QualityScaler upscales a video, it stores every upscaled frame as a `.jpg` file in a frames directory alongside the output video. When you start upscaling the same video again with the same settings, QualityScaler checks whether that directory already exists and contains more than one upscaled frame:
+
+```python
+if os_path_exists(target_directory):
+    upscaled_frames = [f for f in os_listdir(target_directory) if selected_AI_model in f]
+    if len(upscaled_frames) > 1:
+        # resume mode: skip re-extraction, filter already-done frames
+```
+
+If the check passes, the extraction step is skipped entirely and the frame list is filtered to exclude any frames that already have an upscaled counterpart on disk:
+
+```python
+self.frames_paths_to_upscale = [
+    (input_frame, output_frame)
+    for input_frame, output_frame in zip(extracted_frames, upscaled_frames)
+    if not os_path_exists(output_frame)
+]
+```
+
+Only frames with a missing output file are queued for processing. The rest are skipped.
+
+## Stopping a job
+
+Click the **STOP** button at any time during processing. QualityScaler finishes the frame currently being upscaled and then halts. All frames completed up to that point remain on disk.
+
+<Note>
+  The STOP button does not interrupt the current frame mid-upscale — it signals QualityScaler to stop after the current frame completes. This prevents corrupted partial frames from being written to disk.
+</Note>
+
+## Resuming a job
+
+<Steps>
+  <Step title="Load the same video file">
+    Click **SELECT FILES** and add the same input video you were processing before.
+  </Step>
+  <Step title="Use the exact same settings">
+    Set the **AI model**, **Input Resolution %**, **Output Resolution %**, **AI Blending**, and output path to the same values you used in the original session. These values form part of the frames directory name — if any differ, QualityScaler will not find the existing frames and will start from scratch.
+  </Step>
+  <Step title="Click UPSCALE">
+    Click **UPSCALE**. QualityScaler detects the existing frames directory, skips frame extraction, and immediately begins upscaling only the remaining frames. The status counter reflects the number of frames already completed.
+  </Step>
+</Steps>
+
+## The frames directory
+
+QualityScaler stores extracted and upscaled frames in a directory named after the output file's settings. The pattern is:
+
+```text
+<video_name>_<AI_model>_InputR-<input%>_OutputR-<output%>[_Blending-Low|Medium|High]
+```
+
+For example:
+
+```text
+clip_LVAx2_InputR-100_OutputR-100/
+anime_RealESR_Gx4_InputR-75_OutputR-100_Blending-Low/
+```
+
+This directory is created in the same location as the output video. Each upscaled frame inside the directory is named after the original frame with the AI model appended:
+
+```text
+frame_001_LVAx2_InputR-100_OutputR-100.jpg
+frame_002_LVAx2_InputR-100_OutputR-100.jpg
+```
+
+The presence of these files is exactly what the resume check looks for.
+
+<Warning>
+  Changing **any** upscaling setting — AI model, Input Resolution %, Output Resolution %, or Blending level — changes the frames directory name. QualityScaler will not find the old directory and will extract and upscale all frames from the beginning. Previously saved frames from the old settings remain on disk and must be deleted manually if no longer needed.
+</Warning>
+
+## Keep Frames
+
+By default, the frames directory is deleted after the final video is encoded. Enable **Keep Frames** to retain it.
+
+| Keep Frames | Behavior |
+|-------------|----------|
+| OFF (default) | Frames directory is deleted after encoding completes. |
+| ON | Frames directory is preserved on disk after encoding completes. |
+
+Keeping frames is useful when:
+
+- You want to re-encode the upscaled video with a different codec without running the AI upscaling step again.
+- You need the individual upscaled frames for compositing or editing in another application.
+- You want a backup of the upscaled frames in case encoding fails.
+
+<Tip>
+  If you plan to experiment with different video codecs on the same upscaled content, enable **Keep Frames** before the first run. You can then re-encode from the existing frames by selecting a different codec and clicking **UPSCALE** again — QualityScaler will skip re-upscaling and go straight to encoding.
+</Tip>
+
+## Storage requirements
+
+Each extracted frame is saved as a high-quality JPEG (ffmpeg `-qscale:v 1`). At this quality level, a single 1080p frame is roughly 500 KB to 1 MB. For a 30-minute video at 24 fps this means:
+
+```text
+30 min × 60 s × 24 fps = 43,200 frames
+43,200 × ~750 KB ≈ 31 GB
+```
+
+Make sure you have enough free disk space on the drive where your output is saved before starting a long upscaling job.

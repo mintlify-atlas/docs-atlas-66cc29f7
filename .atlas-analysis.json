@@ -1,0 +1,80 @@
+{
+  "projectType": "saas",
+  "projectName": "QualityScaler",
+  "projectDescription": "A Windows desktop app powered by AI to enhance, upscale, and de-noise images and videos using ONNX-based deep learning models.",
+  "theme": "almond",
+  "primaryColor": "#fb5c5c",
+  "lightColor": null,
+  "darkColor": null,
+  "navigation": {
+    "tabs": [
+      {
+        "tab": "Documentation",
+        "groups": [
+          {
+            "group": "Get Started",
+            "pages": [
+              "introduction",
+              "installation",
+              "quickstart"
+            ]
+          },
+          {
+            "group": "Using QualityScaler",
+            "pages": [
+              "guides/loading-files",
+              "guides/ai-models",
+              "guides/upscaling-settings",
+              "guides/output-settings",
+              "guides/upscaling-images",
+              "guides/upscaling-videos"
+            ]
+          },
+          {
+            "group": "Advanced",
+            "pages": [
+              "advanced/gpu-configuration",
+              "advanced/video-codecs",
+              "advanced/tiling-vram",
+              "advanced/stop-resume"
+            ]
+          },
+          {
+            "group": "Reference",
+            "pages": [
+              "reference/ai-models",
+              "reference/supported-formats",
+              "reference/system-requirements",
+              "reference/faq"
+            ]
+          }
+        ]
+      }
+    ]
+  },
+  "keyFeatures": [
+    "AI-powered image and video upscaling (2x and 4x)",
+    "Multiple AI models: LVA, RealESR, BSRGAN, RealESRGAN, MSharp, IRCNN",
+    "GPU acceleration via DirectML (supports AMD, Intel, NVIDIA)",
+    "Automatic image tiling to work within GPU VRAM limits",
+    "Multi-threaded video frame upscaling",
+    "Hardware-accelerated video encoding (NVENC, AMF, QSV)",
+    "AI blending/interpolation between original and upscaled output",
+    "Video upscaling Stop & Resume support",
+    "Metadata preservation via exiftool",
+    "Privacy-focused: fully offline, no internet connection required",
+    "Support for wide range of image and video formats",
+    "Configurable input/output resolution scaling"
+  ],
+  "publicApiSurface": [
+    "AI_upscale class — AI_orchestration(image) -> upscaled image",
+    "VideoUpscaleTask class — orchestrates video frame extraction, upscaling, and encoding",
+    "upscale_image() — upscales a single image file with given settings",
+    "upscale_video() — extracts frames, upscales, and encodes video",
+    "upscale_orchestrator() — top-level multiprocessing orchestrator for batch upscaling",
+    "AI models: LVAx2, RealESR_Gx4, RealESR_Ax4, BSRGANx2, BSRGANx4, RealESRGANx4, MSharpx4, IRCNN_Mx1, IRCNN_Lx1",
+    "Supported image formats: jpg, jpeg, png, bmp, tif, tiff, webp, heic",
+    "Supported video formats: mp4, webm, mkv, flv, gif, avi, mov, qt, 3gp, mpg, mpeg, vob",
+    "Video codecs: x264, x265, h264_nvenc, hevc_nvenc, h264_amf, hevc_amf, h264_qsv, hevc_qsv"
+  ]
+}

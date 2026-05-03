@@ -1,0 +1,136 @@
+---
+title: 'AI models in QualityScaler: choosing the right one'
+description: 'Compare all nine QualityScaler AI models by use case, scale factor, and VRAM requirements to choose the best model for your content.'
+keywords: ['QualityScaler', 'AI models', 'BSRGANx4', 'RealESRGAN', 'LVAx2', 'IRCNN', 'MSharp', 'upscaling model', 'VRAM']
+---
+
+QualityScaler includes nine AI models, each tuned for a different type of content. Picking the right model is the single most important factor in output quality. This page describes what each model does, how much VRAM it needs, and when to use it.
+
+## Quick reference
+
+| Model | Scale | VRAM | Best for |
+|-------|-------|------|----------|
+| `LVAx2` | 2x | 2 GB | Live-action video upscaling |
+| `RealESR_Gx4` | 4x | 2.5 GB | Animated and degraded video |
+| `RealESR_Ax4` | 4x | 2.5 GB | Animated and degraded video |
+| `BSRGANx2` | 2x | 0.8 GB | High-quality photo upscaling |
+| `BSRGANx4` | 4x | 0.75 GB | High-quality photo upscaling |
+| `RealESRGANx4` | 4x | 0.75 GB | High-detail image upscaling |
+| `MSharpx4` | 4x | 1.5 GB | Sharpening and upscaling clean photos |
+| `IRCNN_Mx1` | 1x | 4 GB | Image and video de-noising (medium) |
+| `IRCNN_Lx1` | 1x | 4 GB | Image and video de-noising (strong) |
+
+<Info>
+  VRAM values are used by QualityScaler to calculate tile sizes. If you have less VRAM than the listed amount, QualityScaler automatically tiles the image to stay within your budget — processing will be slower but the output will still be correct.
+</Info>
+
+## Model details
+
+<AccordionGroup>
+  <Accordion title="LVAx2 — live-action video upscaling (2x)">
+    **Scale**: 2x | **VRAM**: 2 GB
+
+    LVAx2 is optimized for live-action video content: real-world footage of people, environments, and objects. It applies a 2x scale factor, making it a good choice when you want to double the resolution of a video without introducing over-sharpening artifacts common in general-purpose models.
+
+    **Tips**:
+    - Set **AI Blending** to **OFF** or **Low** to preserve natural film grain and texture.
+    - Use for footage such as home videos, interviews, or documentary content.
+  </Accordion>
+
+  <Accordion title="RealESR_Gx4 — animated and degraded video (4x)">
+    **Scale**: 4x | **VRAM**: 2.5 GB
+
+    RealESR_Gx4 applies a 4x upscale and is trained on a broad range of degraded and animated video content. It handles compression artifacts, noise, and blurring well.
+
+    **Tips**:
+    - Use **Low** blending for animation and anime content to preserve flat color areas.
+    - Use **Medium** or **High** blending for live-action content where some original texture should be retained.
+  </Accordion>
+
+  <Accordion title="RealESR_Ax4 — animated and degraded video (4x)">
+    **Scale**: 4x | **VRAM**: 2.5 GB
+
+    RealESR_Ax4 is a companion model to RealESR_Gx4, also targeting animated and degraded video at 4x scale. Use it when RealESR_Gx4 produces over-smoothed results on your specific content.
+
+    **Tips**:
+    - Same blending guidance as RealESR_Gx4: **Low** for animation, **Medium** or **High** for live-action.
+    - Try both RealESR_Gx4 and RealESR_Ax4 on a short clip and compare the results.
+  </Accordion>
+
+  <Accordion title="BSRGANx2 — high-quality image upscaling (2x)">
+    **Scale**: 2x | **VRAM**: 0.8 GB
+
+    BSRGANx2 is a lightweight model designed for 2x upscaling of photographs and high-quality images. Its low VRAM requirement makes it usable on almost any GPU without tiling overhead.
+
+    **Tips**:
+    - A good choice for batch processing large numbers of images on systems with limited VRAM.
+    - Use when you need a moderate resolution increase without the artifacts that can appear at 4x.
+  </Accordion>
+
+  <Accordion title="BSRGANx4 — high-quality image upscaling (4x)">
+    **Scale**: 4x | **VRAM**: 0.75 GB
+
+    BSRGANx4 delivers 4x upscaling with very low VRAM usage, making it one of the most accessible models in QualityScaler. It is well-suited to photographs with natural textures.
+
+    **Tips**:
+    - A solid default for photo upscaling when you are unsure which model to pick.
+    - Works well with **AI Blending** set to **OFF** for clean outputs.
+  </Accordion>
+
+  <Accordion title="RealESRGANx4 — high-detail image upscaling (4x)">
+    **Scale**: 4x | **VRAM**: 0.75 GB
+
+    RealESRGANx4 is trained to restore fine detail at 4x scale. It performs well on images with complex textures such as fabric, foliage, and architecture.
+
+    **Tips**:
+    - Prefer over BSRGANx4 when the source image contains a lot of fine detail that you want to preserve.
+    - Can produce over-sharpened edges on smooth or flat subjects — use **Low** blending if that occurs.
+  </Accordion>
+
+  <Accordion title="MSharpx4 — sharpening and upscaling (4x)">
+    **Scale**: 4x | **VRAM**: 1.5 GB
+
+    MSharpx4 combines upscaling with active sharpening. It is designed for high-quality source photos where you want crisp, well-defined edges in the output.
+
+    **Tips**:
+    - Use only on already good-quality photos. Applying MSharpx4 to blurry or noisy input will sharpen the artifacts, not the content.
+    - Avoid for video — the sharpening can cause flickering between frames.
+  </Accordion>
+
+  <Accordion title="IRCNN_Mx1 — medium de-noising (1x)">
+    **Scale**: 1x | **VRAM**: 4 GB
+
+    IRCNN_Mx1 applies medium-strength noise reduction without changing the resolution (1x scale). It is useful when your source material is noisy but you do not want to upscale it.
+
+    **Tips**:
+    - Set **AI Blending** to **OFF** — blending a de-noised output with the original reintroduces the noise you are trying to remove.
+    - Requires 4 GB of VRAM; on lower-end GPUs, QualityScaler will tile heavily and processing will be slow.
+  </Accordion>
+
+  <Accordion title="IRCNN_Lx1 — strong de-noising (1x)">
+    **Scale**: 1x | **VRAM**: 4 GB
+
+    IRCNN_Lx1 applies stronger noise reduction than IRCNN_Mx1, also at 1x scale. Use it when IRCNN_Mx1 does not remove enough noise from your source.
+
+    **Tips**:
+    - Same guidelines as IRCNN_Mx1: set **AI Blending** to **OFF**.
+    - Strong de-noising can soften fine detail — compare outputs at both medium and strong settings before committing to a large batch.
+  </Accordion>
+</AccordionGroup>
+
+## Choosing a model by use case
+
+<CardGroup cols={2}>
+  <Card title="Upscaling photos" icon="image">
+    Start with **BSRGANx4** for general photos. Use **RealESRGANx4** when fine detail matters. Use **MSharpx4** on clean, sharp photos where you want extra clarity.
+  </Card>
+  <Card title="Upscaling live-action video" icon="video">
+    Use **LVAx2** for real-world footage. Set blending to **OFF** or **Low** to preserve natural texture.
+  </Card>
+  <Card title="Upscaling animation or anime" icon="film">
+    Use **RealESR_Gx4** or **RealESR_Ax4**. Set blending to **Low** to keep flat colors clean.
+  </Card>
+  <Card title="De-noising without upscaling" icon="wand-magic-sparkles">
+    Use **IRCNN_Mx1** for moderate noise or **IRCNN_Lx1** for heavy noise. Keep blending **OFF**.
+  </Card>
+</CardGroup>

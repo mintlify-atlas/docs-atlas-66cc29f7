@@ -1,0 +1,104 @@
+---
+title: 'Video encoding codecs in QualityScaler'
+description: 'Choose the right codec for re-encoding upscaled video in QualityScaler, with per-vendor hardware acceleration options and automatic x264 fallback.'
+keywords: ['QualityScaler', 'video codec', 'x264', 'x265', 'h264_nvenc', 'hevc_nvenc', 'h264_amf', 'hevc_amf', 'h264_qsv', 'hevc_qsv', 'ffmpeg', 'encoding']
+---
+
+After every frame has been upscaled, QualityScaler hands the result to ffmpeg to re-encode the frames into a single video file. The **Video Codec** setting controls which encoder ffmpeg uses for that step. Choosing the right codec affects file size, encoding speed, and compatibility with players and editors.
+
+## Available codecs
+
+QualityScaler groups its codec options by vendor:
+
+<Tabs>
+  <Tab title="Software">
+    These codecs run entirely on the CPU. They work on any system regardless of GPU vendor, making them the safest choice if hardware encoding is unavailable or produces unexpected output.
+
+    | Codec | Standard | Notes |
+    |-------|----------|-------|
+    | `x264` | H.264 / AVC | Default. Widest compatibility across players, devices, and editors. |
+    | `x265` | H.265 / HEVC | Roughly 40–50% smaller files than x264 at the same quality, but significantly slower to encode. |
+
+    Use `x264` when compatibility matters most. Use `x265` when you need smaller files and encoding time is not a concern.
+  </Tab>
+  <Tab title="NVIDIA (NVENC)">
+    NVIDIA GPUs from the Kepler generation (GTX 600 series) onward include a dedicated NVENC hardware encoder. Hardware encoding runs in parallel with AI upscaling and is typically 5–10× faster than software encoding.
+
+    | Codec | Standard | Notes |
+    |-------|----------|-------|
+    | `h264_nvenc` | H.264 / AVC | Fast hardware H.264 encoding. Good compatibility. |
+    | `hevc_nvenc` | H.265 / HEVC | Fast hardware HEVC encoding. Smaller files than `h264_nvenc` with similar quality. |
+
+    `hevc_nvenc` is the best option for NVIDIA users who want smaller output files without sacrificing quality or encoding speed.
+
+    <Note>
+      NVENC availability depends on your driver version and GPU generation. If `hevc_nvenc` fails, QualityScaler automatically falls back to `x264`.
+    </Note>
+  </Tab>
+  <Tab title="AMD (AMF)">
+    AMD GPUs from the RX 400 series onward support AMF (Advanced Media Framework) hardware encoding.
+
+    | Codec | Standard | Notes |
+    |-------|----------|-------|
+    | `h264_amf` | H.264 / AVC | Fast hardware H.264 encoding via AMD AMF. |
+    | `hevc_amf` | H.265 / HEVC | Fast hardware HEVC encoding. Smaller files than `h264_amf`. |
+
+    `hevc_amf` gives the best combination of speed and file size for AMD users.
+
+    <Note>
+      AMF requires the AMD display driver to be installed. If `hevc_amf` fails, QualityScaler automatically falls back to `x264`.
+    </Note>
+  </Tab>
+  <Tab title="Intel (Quick Sync)">
+    Intel CPUs and GPUs with Quick Sync Video support hardware encoding through the `qsv` family of codecs. Quick Sync is available on most Intel processors from the Sandy Bridge generation onward and on Intel Arc GPUs.
+
+    | Codec | Standard | Notes |
+    |-------|----------|-------|
+    | `h264_qsv` | H.264 / AVC | Hardware H.264 encoding via Intel Quick Sync. |
+    | `hevc_qsv` | H.265 / HEVC | Hardware HEVC encoding via Intel Quick Sync. |
+
+    `hevc_qsv` is the preferred option for Intel users when file size matters.
+
+    <Note>
+      Quick Sync requires the Intel graphics driver to be active, even on systems where the primary GPU is a dedicated card. If `hevc_qsv` fails, QualityScaler automatically falls back to `x264`.
+    </Note>
+  </Tab>
+</Tabs>
+
+## Automatic fallback to x264
+
+If the selected codec fails during encoding — for example, because the hardware encoder is unavailable, the driver does not support the requested format, or a codec-specific error occurs — QualityScaler automatically retries the encoding step using `libx264` (software H.264). The status bar will display `Encoding upscaled video (x264 fallback)` when this happens.
+
+This means you will always get a usable output video, even if your hardware encoder encounters an error.
+
+<Warning>
+  If fallback encoding runs, the output file will be encoded in H.264 regardless of your codec selection. Check the status bar message to confirm which codec was actually used.
+</Warning>
+
+## Choosing a codec
+
+<AccordionGroup>
+  <Accordion title="I just want it to work — what should I use?">
+    Use `x264`. It runs on any system, produces files that play everywhere, and never falls back because it is already the fallback codec.
+  </Accordion>
+
+  <Accordion title="I want smaller output files">
+    Use `x265` (software) or a hardware HEVC codec (`hevc_nvenc`, `hevc_amf`, or `hevc_qsv`) depending on your GPU. HEVC encodes at roughly half the file size of H.264 for the same visual quality. Hardware HEVC is much faster than software `x265`.
+  </Accordion>
+
+  <Accordion title="I want the fastest possible encoding">
+    Use the hardware codec that matches your GPU: `h264_nvenc` for NVIDIA, `h264_amf` for AMD, `h264_qsv` for Intel. Hardware encoders run on dedicated silicon and do not block the AI upscaling pipeline.
+  </Accordion>
+
+  <Accordion title="My output video won't play in my media player">
+    Switch to `x264`. Some players and devices do not support HEVC. H.264 has near-universal playback support.
+  </Accordion>
+
+  <Accordion title="The codec option I selected is greyed out">
+    Separator lines (`----`) in the codec dropdown are visual dividers and cannot be selected. If you accidentally select one, QualityScaler will fall back to `x264` at encoding time.
+  </Accordion>
+</AccordionGroup>
+
+## Audio handling
+
+QualityScaler copies the original audio stream directly into the output file without re-encoding it (`-c:a copy`). The audio quality and format from the source video are preserved unchanged, regardless of which video codec you select.

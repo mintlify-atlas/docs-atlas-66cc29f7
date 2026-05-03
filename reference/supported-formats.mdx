@@ -1,0 +1,70 @@
+---
+title: "Supported file formats in QualityScaler"
+description: "Complete list of image and video formats QualityScaler can read as input and write as output, including format-specific notes and recommendations."
+---
+
+QualityScaler supports a wide range of image and video formats for both input and output. You can mix images and videos in the same upscaling session — the app processes them all in a single run.
+
+## Input formats
+
+### Images
+
+| Format | Extensions | Notes |
+|---|---|---|
+| JPEG | `.jpg`, `.jpeg` | Most common photo format |
+| PNG | `.png` | Lossless, supports transparency (RGBA) |
+| WebP | `.webp` | Modern web format, lossy or lossless |
+| BMP | `.bmp` | Uncompressed bitmap |
+| TIFF | `.tif`, `.tiff` | High bit-depth, professional use |
+| HEIC | `.heic` | Apple devices default format |
+
+<Note>
+  QualityScaler correctly handles images in RGB, RGBA (with transparency), and grayscale color modes. The alpha channel is upscaled separately and preserved in the output.
+</Note>
+
+### Videos
+
+| Format | Extensions | Notes |
+|---|---|---|
+| MP4 | `.mp4` | Most compatible container |
+| WebM | `.webm` | Open web format |
+| MKV | `.mkv` | High-quality, flexible container |
+| FLV | `.flv` | Legacy Flash video |
+| GIF | `.gif` | Animated GIF treated as video |
+| M4V | `.m4v` | iTunes video format |
+| AVI | `.avi` | Legacy Windows video |
+| MOV | `.mov` | Apple QuickTime |
+| QuickTime | `.qt` | QuickTime format |
+| 3GP | `.3gp` | Mobile video format |
+| MPEG | `.mpg`, `.mpeg` | Legacy MPEG video |
+| VOB | `.vob` | DVD video format |
+
+<Info>
+  GIF files are treated as video input. Frames are extracted, upscaled, and re-encoded as a standard video format (not GIF). Select your preferred output container from the video extension menu.
+</Info>
+
+## Output formats
+
+### Images
+
+| Extension | Type | Notes |
+|---|---|---|
+| `.png` | Lossless | Best quality, larger file size — recommended default |
+| `.jpg` | Lossy | Smaller files, slight quality loss |
+| `.bmp` | Uncompressed | Very large files, no compression |
+| `.tiff` | Lossless | High bit-depth, suitable for professional workflows |
+
+<Tip>
+  Use `.png` for the best quality output. Use `.jpg` if storage space is a concern and the small quality difference is acceptable.
+</Tip>
+
+### Videos
+
+| Extension | Notes |
+|---|---|
+| `.mp4` | Best compatibility across devices and platforms |
+| `.mkv` | Supports multiple audio/subtitle tracks |
+| `.avi` | Legacy format, wide software compatibility |
+| `.mov` | Apple ecosystem and video editing tools |
+
+The video codec you select determines the compression format inside the container. See [Video Codecs](/advanced/video-codecs) for guidance on choosing the right codec.
